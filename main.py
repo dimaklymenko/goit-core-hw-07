@@ -63,7 +63,7 @@ class Record:
         return None
        
     def __str__(self):
-        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
+        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}, birthday: {self.birthday}"
 
 class AddressBook(UserDict):
 
@@ -101,15 +101,18 @@ class AddressBook(UserDict):
         today = date.today()
         for user in self.data:
             birthday = self.data[user].birthday
-            birthday_1 = str(birthday)
-            birthday_2 = self.string_to_date(birthday_1)
-            birthday_this_year = birthday_2.replace(year=today.year)
-            if birthday_this_year < today:
-                birthday_this_year = birthday_2.replace(year=today.year + 1)
-            if 0 <= (birthday_this_year - today).days <= days:
-                birthday_this_year = self.adjust_for_weekend(birthday_this_year)
-                congratulation_date_str = self.date_to_string(birthday_this_year)
-                upcoming_birthdays.append({"name": self.data[user].name.value, "birthday": congratulation_date_str})
+            if birthday is None:
+                continue
+            else:
+                birthday_1 = str(birthday)
+                birthday_2 = self.string_to_date(birthday_1)
+                birthday_this_year = birthday_2.replace(year=today.year)
+                if birthday_this_year < today:
+                    birthday_this_year = birthday_2.replace(year=today.year + 1)
+                if 0 <= (birthday_this_year - today).days <= days:
+                    birthday_this_year = self.adjust_for_weekend(birthday_this_year)
+                    congratulation_date_str = self.date_to_string(birthday_this_year)
+                    upcoming_birthdays.append({"name": self.data[user].name.value, "birthday": congratulation_date_str})  
         return upcoming_birthdays        
     
     def __str__(self):
@@ -183,11 +186,12 @@ def change_contact(args, book: AddressBook):
 @input_error
 def show_phone(args, book: AddressBook):
     name, *_ = args
-    return book[name].__str__()
+    return f"Contact name: {name}, phones: {'; '.join(p.value for p in book[name].phones)}"
 
 @input_error
-def show_all(book: AddressBook):
-    return book    
+def show_all(args, book: AddressBook):
+    args = args
+    return book
 
 def main():
     book = AddressBook()
@@ -213,7 +217,7 @@ def main():
             print(show_phone(args, book))
 
         elif command == "all":
-            print(show_all(book))
+            print(show_all(args, book))
 
         elif command == "add-birthday":
             print(add_birthday(args, book))
