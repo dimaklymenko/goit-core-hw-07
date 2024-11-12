@@ -101,15 +101,18 @@ class AddressBook(UserDict):
         today = date.today()
         for user in self.data:
             birthday = self.data[user].birthday
-            birthday_1 = str(birthday)
-            birthday_2 = self.string_to_date(birthday_1)
-            birthday_this_year = birthday_2.replace(year=today.year)
-            if birthday_this_year < today:
-                birthday_this_year = birthday_2.replace(year=today.year + 1)
-            if 0 <= (birthday_this_year - today).days <= days:
-                birthday_this_year = self.adjust_for_weekend(birthday_this_year)
-                congratulation_date_str = self.date_to_string(birthday_this_year)
-                upcoming_birthdays.append({"name": self.data[user].name.value, "birthday": congratulation_date_str})
+            if birthday is None:
+                continue
+            else:
+                birthday_1 = str(birthday)
+                birthday_2 = self.string_to_date(birthday_1)
+                birthday_this_year = birthday_2.replace(year=today.year)
+                if birthday_this_year < today:
+                    birthday_this_year = birthday_2.replace(year=today.year + 1)
+                if 0 <= (birthday_this_year - today).days <= days:
+                    birthday_this_year = self.adjust_for_weekend(birthday_this_year)
+                    congratulation_date_str = self.date_to_string(birthday_this_year)
+                    upcoming_birthdays.append({"name": self.data[user].name.value, "birthday": congratulation_date_str})  
         return upcoming_birthdays        
     
     def __str__(self):
